@@ -831,7 +831,11 @@
     <div id="tab-serv" class="tab-content">
       <h3 style="color:var(--ink);margin-bottom:8px">Gestión de Servicios</h3>
       <p style="color:var(--ink-faint);font-size:13px;margin-bottom:16px">Agrega, edita o elimina los servicios que aparecen en tu página. Cada uno tiene un ícono, título y descripción.</p>
-      <button class="btn btn-primary" onclick="openServModal()" style="margin-bottom:20px;padding:8px 18px;font-size:13px">+ Agregar servicio</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+        <button class="btn btn-primary" onclick="openServModal()" style="padding:8px 18px;font-size:13px">+ Agregar servicio</button>
+        <button class="btn btn-ghost" onclick="importServicios()" style="padding:8px 18px;font-size:13px">⬇ Importar servicios actuales</button>
+      </div>
+      <p id="servImportHint" style="color:var(--cyan-soft);font-size:12px;margin:-8px 0 16px;display:none">Si la lista está vacía, presiona "Importar servicios actuales" una vez para traer tus 9 servicios y poder editarlos.</p>
       <div id="adminServList"></div>
     </div>
     <div id="tab-port" class="tab-content">
@@ -1117,6 +1121,24 @@
     }
   }
 
+  // Importación manual de los 9 servicios originales (botón en el admin)
+  window.importServicios = async () => {
+    try {
+      const flagRef = fsDoc(db, 'config', 'servicios');
+      const flagSnap = await getDoc(flagRef);
+      if(flagSnap.exists() && flagSnap.data().seeded) {
+        return alert('Tus servicios ya fueron importados. Si no los ves en la lista, recarga la página (Ctrl+Shift+R).');
+      }
+      for(let i = 0; i < SERV_DEFAULTS.length; i++) {
+        await addDoc(collection(db, 'servicios'), { ...SERV_DEFAULTS[i], orden: i, timestamp: new Date() });
+      }
+      await setDoc(flagRef, { seeded: true }, { merge: true });
+      alert('¡Listo! Se importaron tus 9 servicios. Ya puedes editarlos y eliminarlos.');
+    } catch(e) {
+      alert('Error al importar: ' + e.message + '\n\nVerifica que actualizaste las reglas de Firestore para la colección "servicios".');
+    }
+  };
+
   function loadServicios() {
     const q = query(collection(db, 'servicios'), orderBy('orden', 'asc'));
     onSnapshot(q, (snap) => {
@@ -1130,7 +1152,9 @@
       const pG = document.getElementById('servicesGrid');
       if(pG && snap.size > 0) pG.innerHTML = pubHtml; // solo reemplaza si hay datos (conserva fallback)
       const aG = document.getElementById('adminServList');
-      if(aG) aG.innerHTML = adminHtml || '<p style="color:var(--ink-faint);font-size:13px;margin-top:8px">Aún no hay servicios. Usa el botón para agregar.</p>';
+      if(aG) aG.innerHTML = adminHtml || '<p style="color:var(--ink-faint);font-size:13px;margin-top:8px">Aún no hay servicios. Usa "Importar servicios actuales" para traer tus 9 servicios.</p>';
+      const hint = document.getElementById('servImportHint');
+      if(hint) hint.style.display = snap.size === 0 ? 'block' : 'none';
     });
   }
   window.__servicesCache = {};
