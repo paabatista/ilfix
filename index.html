@@ -216,7 +216,7 @@
   /* Admin & Portfolio CSS */
   #admin-panel{display:none;min-height:100vh;padding:100px 24px 60px;background:var(--teal-darkest);position:fixed;inset:0;z-index:9999;overflow-y:auto}
   body.admin-mode #admin-panel{display:block}
-  body.admin-mode > :not(#admin-panel):not(.bg-wrap):not(#portModal):not(#testModal):not(#blogModal):not(#promoModal){display:none!important}
+  body.admin-mode > :not(#admin-panel):not(.bg-wrap):not(#portModal):not(#testModal):not(#blogModal):not(#promoModal):not(#servModal){display:none!important}
   
   .admin-box{max-width:1000px;margin:0 auto;background:rgba(8,27,34,.8);border:1px solid var(--cyan);border-radius:24px;padding:34px}
   .admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;border-bottom:1px solid var(--line);padding-bottom:16px}
@@ -309,7 +309,24 @@
   .leads-table td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--ink-dim)}
 
   /* ---- Modals open state ---- */
-  #portModal.open,#testModal.open,#blogModal.open,#promoModal.open{display:flex!important}
+  #portModal.open,#testModal.open,#blogModal.open,#promoModal.open,#servModal.open{display:flex!important}
+
+  /* ---- Icon picker (servicios) ---- */
+  .icon-picker{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:6px}
+  .icon-opt{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(8,27,34,.55);border:1px solid var(--line);cursor:pointer;transition:.2s}
+  .icon-opt svg{width:22px;height:22px;stroke:var(--cyan-soft);fill:none;stroke-width:1.8}
+  .icon-opt:hover{border-color:var(--cyan-soft)}
+  .icon-opt.sel{border-color:var(--cyan);background:rgba(95,208,226,.15);box-shadow:0 0 0 2px rgba(95,208,226,.2)}
+
+  /* ---- Admin service row ---- */
+  .serv-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px}
+  .serv-row .serv-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(95,208,226,.16),rgba(42,125,153,.12));border:1px solid var(--line);flex-shrink:0}
+  .serv-row .serv-ico svg{width:21px;height:21px;stroke:var(--cyan-soft);fill:none;stroke-width:1.8}
+  .serv-row .serv-info{flex:1;min-width:0}
+  .serv-row .serv-info strong{color:var(--ink);font-size:14px;display:block;margin-bottom:2px}
+  .serv-row .serv-info span{color:var(--ink-faint);font-size:12px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .serv-row .serv-edit{background:rgba(95,208,226,.15);color:var(--cyan);border:1px solid rgba(95,208,226,.3);border-radius:7px;padding:5px 11px;font-size:12px;cursor:pointer;flex-shrink:0}
+  .serv-row .serv-del{background:rgba(200,30,30,.85);color:#fff;border:none;border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;flex-shrink:0}
 
   /* ---- Toggle switch ---- */
   .toggle-wrap{display:flex;align-items:center;gap:10px}
@@ -410,7 +427,7 @@
       <h2>Servicios de soporte IT</h2>
       <p>Todo lo que tu computadora, red o negocio necesita, en un solo lugar.</p>
     </div>
-    <div class="services">
+    <div class="services" id="servicesGrid">
       <div class="scard reveal">
         <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20M8 20v-2M16 20v-2"/></svg></div>
         <h3>Reparación de PCs y Laptops</h3>
@@ -797,6 +814,7 @@
     </div>
     <div class="admin-tabs">
       <button class="tab-btn active" onclick="switchTab('tab-leads',this)">📋 Cotizaciones</button>
+      <button class="tab-btn" onclick="switchTab('tab-serv',this)">🛠️ Servicios</button>
       <button class="tab-btn" onclick="switchTab('tab-port',this)">🖼️ Portafolio</button>
       <button class="tab-btn" onclick="switchTab('tab-sections',this)">📂 Secciones</button>
     </div>
@@ -809,6 +827,12 @@
           <tbody id="leadsBody"></tbody>
         </table>
       </div>
+    </div>
+    <div id="tab-serv" class="tab-content">
+      <h3 style="color:var(--ink);margin-bottom:8px">Gestión de Servicios</h3>
+      <p style="color:var(--ink-faint);font-size:13px;margin-bottom:16px">Agrega, edita o elimina los servicios que aparecen en tu página. Cada uno tiene un ícono, título y descripción.</p>
+      <button class="btn btn-primary" onclick="openServModal()" style="margin-bottom:20px;padding:8px 18px;font-size:13px">+ Agregar servicio</button>
+      <div id="adminServList"></div>
     </div>
     <div id="tab-port" class="tab-content">
       <h3 style="color:var(--ink);margin-bottom:8px">Gestión de Portafolio</h3>
@@ -875,6 +899,21 @@
 
 <!-- ===== MODALS (excluidos del CSS admin-mode hide rule) ===== -->
 
+<!-- Servicio modal -->
+<div id="servModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.75);align-items:center;justify-content:center">
+  <div style="background:#0d1b22;border:1px solid var(--cyan);border-radius:16px;padding:28px;max-width:480px;width:90%;max-height:90vh;overflow-y:auto">
+    <h3 id="servModalTitle" style="color:var(--cyan);margin:0 0 16px">Agregar servicio</h3>
+    <input id="servId" type="hidden">
+    <div class="field" style="margin-bottom:12px"><label style="color:var(--ink)">Título</label><input id="servTitulo" type="text" placeholder="Ej: Reparación de PCs y Laptops"></div>
+    <div class="field" style="margin-bottom:12px"><label style="color:var(--ink)">Descripción</label><textarea id="servDesc" placeholder="Describe el servicio..." style="width:100%;padding:12px;border-radius:10px;background:rgba(8,27,34,.55);border:1px solid var(--line);color:var(--ink);font-size:14px;outline:none;resize:vertical;min-height:80px"></textarea></div>
+    <div class="field" style="margin-bottom:12px"><label style="color:var(--ink)">Ícono</label><div id="servIconPicker" class="icon-picker"></div></div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-primary" onclick="saveServItem()" style="flex:1">Guardar</button>
+      <button class="btn btn-ghost" onclick="closeServModal()" style="flex:1">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Portafolio modal -->
 <div id="portModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.75);align-items:center;justify-content:center">
   <div style="background:#0d1b22;border:1px solid var(--cyan);border-radius:16px;padding:28px;max-width:420px;width:90%">
@@ -936,7 +975,7 @@
 <!-- Firebase SDK & Admin Logic -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, deleteDoc, doc as fsDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, deleteDoc, doc as fsDoc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
@@ -985,6 +1024,7 @@
       document.body.classList.add('admin-mode');
       loadLeads();
       loadPortfolio();
+      seedServicios();
     } else {
       document.body.classList.remove('admin-mode');
     }
@@ -1025,6 +1065,151 @@
 
   // Load public portfolio initially
   loadPortfolio();
+
+  // ===== SERVICIOS (gestión dinámica) =====
+  // Galería de íconos disponibles (mismo estilo SVG de la página)
+  const SERV_ICONS = {
+    pc:        '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20M8 20v-2M16 20v-2"/>',
+    camara:    '<path d="M12 3v2M5 8l1.5 1.5M19 8l-1.5 1.5"/><circle cx="12" cy="13" r="4"/><path d="M8 21l1.5-4M16 21l-1.5-4"/>',
+    wifi:      '<path d="M2 8.5a13 13 0 0 1 20 0M5 12a8 8 0 0 1 14 0M8.5 15.5a4 4 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/>',
+    escudo:    '<path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/>',
+    hardware:  '<rect x="4" y="5" width="16" height="11" rx="1"/><path d="M4 9h16M7 19h10M7 12l2 2 4-4"/>',
+    impresora: '<path d="M6 9V4h12v5M6 18h12v3H6zM4 9h16v6H4z"/><circle cx="17" cy="12" r="1"/>',
+    software:  '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M3 13h18M9 21h6M12 17v4"/><path d="M8 8l2 2-2 2M13 12h3"/>',
+    config:    '<path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/><circle cx="12" cy="12" r="3"/>',
+    seguridad: '<path d="M12 2l8 3v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5z"/><circle cx="12" cy="10" r="2"/><path d="M12 12v3M8.5 8.5L7 7M15.5 8.5L17 7"/>',
+    telefono:  '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>',
+    nube:      '<path d="M6 16a4 4 0 0 1 .5-8 5 5 0 0 1 9.5 1.5A3.5 3.5 0 0 1 17 16z"/>',
+    herramienta:'<path d="M14.5 5.5a3.5 3.5 0 0 1-4.6 4.6L4 16v4h4l5.9-5.9a3.5 3.5 0 0 0 4.6-4.6l-2.3 2.3-2-2z"/>',
+    servidor:  '<rect x="3" y="4" width="18" height="6" rx="1"/><rect x="3" y="14" width="18" height="6" rx="1"/><path d="M7 7h.01M7 17h.01"/>',
+    soporte:   '<circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 0 1 5 2c0 2-3 2-3 4M12 17h.01"/>'
+  };
+
+  function svgIcon(key) {
+    const inner = SERV_ICONS[key] || SERV_ICONS.pc;
+    return `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">${inner}</svg>`;
+  }
+
+  // Los 9 servicios originales (se migran a Firestore una sola vez)
+  const SERV_DEFAULTS = [
+    { icon:'pc', titulo:'Reparación de PCs y Laptops', descripcion:'Diagnóstico, mantenimiento preventivo y reparación de hardware y software para que tu equipo vuelva a rendir.' },
+    { icon:'camara', titulo:'Cámaras de Seguridad CCTV', descripcion:'Instalación profesional con monitoreo 24/7, detección de movimiento y vigilancia inteligente para hogar y negocio.' },
+    { icon:'wifi', titulo:'Redes Wi-Fi y Cableado', descripcion:'Configuración y optimización de redes domésticas y empresariales con cobertura estable en todo el lugar.' },
+    { icon:'escudo', titulo:'Virus, Malware y Soporte Remoto', descripcion:'Eliminación de virus y malware, limpieza profunda y asistencia remota inmediata sin que salgas de casa.' },
+    { icon:'hardware', titulo:'Upgrade de Hardware (SSD / RAM)', descripcion:'Mejora la velocidad de tu equipo con instalación de discos SSD y memoria RAM. Más rendimiento, menos espera.' },
+    { icon:'impresora', titulo:'Mantenimiento de Impresoras', descripcion:'Limpieza interna, mantenimiento preventivo y revisión de componentes para impresiones nítidas y mayor durabilidad.' },
+    { icon:'software', titulo:'Windows, Software y Drivers', descripcion:'Instalación y configuración de Windows, programas esenciales y controladores para que todo funcione sin errores.' },
+    { icon:'config', titulo:'Formateo y Optimización', descripcion:'Formateo, limpieza profunda y optimización del sistema para devolverle velocidad y estabilidad a tu equipo.' },
+    { icon:'seguridad', titulo:'Seguridad Informática', descripcion:'Instalación y configuración de firewalls y equipos de seguridad empresarial <strong style="color:var(--cyan-soft);font-weight:600">Fortinet</strong> y <strong style="color:var(--cyan-soft);font-weight:600">Cisco Meraki</strong> para proteger tu red.' }
+  ];
+
+  async function seedServicios() {
+    try {
+      const flagRef = fsDoc(db, 'config', 'servicios');
+      const flagSnap = await getDoc(flagRef);
+      if(flagSnap.exists() && flagSnap.data().seeded) return;
+      for(let i = 0; i < SERV_DEFAULTS.length; i++) {
+        await addDoc(collection(db, 'servicios'), { ...SERV_DEFAULTS[i], orden: i, timestamp: new Date() });
+      }
+      await setDoc(flagRef, { seeded: true }, { merge: true });
+    } catch(e) {
+      console.error('seedServicios:', e);
+    }
+  }
+
+  function loadServicios() {
+    const q = query(collection(db, 'servicios'), orderBy('orden', 'asc'));
+    onSnapshot(q, (snap) => {
+      let pubHtml = '', adminHtml = '';
+      snap.forEach(docSnap => {
+        const d = docSnap.data();
+        pubHtml += `<div class="scard reveal in"><div class="ico">${svgIcon(d.icon)}</div><h3>${d.titulo}</h3><p>${d.descripcion}</p></div>`;
+        const descPlain = (d.descripcion||'').replace(/<[^>]*>/g,'');
+        adminHtml += `<div class="serv-row"><div class="serv-ico">${svgIcon(d.icon)}</div><div class="serv-info"><strong>${d.titulo}</strong><span>${descPlain}</span></div><button class="serv-edit" onclick="editServItem('${docSnap.id}')">Editar</button><button class="serv-del" onclick="deleteServItem('${docSnap.id}')">✕</button></div>`;
+      });
+      const pG = document.getElementById('servicesGrid');
+      if(pG && snap.size > 0) pG.innerHTML = pubHtml; // solo reemplaza si hay datos (conserva fallback)
+      const aG = document.getElementById('adminServList');
+      if(aG) aG.innerHTML = adminHtml || '<p style="color:var(--ink-faint);font-size:13px;margin-top:8px">Aún no hay servicios. Usa el botón para agregar.</p>';
+    });
+  }
+  window.__servicesCache = {};
+
+  window.openServModal = function(id) {
+    document.getElementById('servModalTitle').textContent = id ? 'Editar servicio' : 'Agregar servicio';
+    document.getElementById('servId').value = id || '';
+    if(!id) {
+      document.getElementById('servTitulo').value = '';
+      document.getElementById('servDesc').value = '';
+    }
+    renderIconPicker(id ? (window.__servicesCache[id]?.icon) : 'pc');
+    document.getElementById('servModal').classList.add('open');
+  };
+  window.closeServModal = function() {
+    document.getElementById('servModal').classList.remove('open');
+  };
+
+  function renderIconPicker(selected) {
+    const picker = document.getElementById('servIconPicker');
+    if(!picker) return;
+    let html = '';
+    Object.keys(SERV_ICONS).forEach(key => {
+      html += `<div class="icon-opt${key===selected?' sel':''}" data-icon="${key}" onclick="selectServIcon('${key}')">${svgIcon(key)}</div>`;
+    });
+    picker.innerHTML = html;
+    picker.dataset.selected = selected || 'pc';
+  }
+  window.selectServIcon = function(key) {
+    const picker = document.getElementById('servIconPicker');
+    picker.dataset.selected = key;
+    picker.querySelectorAll('.icon-opt').forEach(o => o.classList.toggle('sel', o.dataset.icon === key));
+  };
+
+  window.editServItem = async (id) => {
+    try {
+      const snap = await getDoc(fsDoc(db, 'servicios', id));
+      if(!snap.exists()) return;
+      const d = snap.data();
+      window.__servicesCache[id] = d;
+      document.getElementById('servTitulo').value = d.titulo || '';
+      // si la descripción trae HTML, mostrar texto plano editable
+      document.getElementById('servDesc').value = d.descripcion || '';
+      openServModal(id);
+    } catch(e) { alert('Error: ' + e.message); }
+  };
+
+  window.saveServItem = async () => {
+    const id = document.getElementById('servId').value;
+    const titulo = document.getElementById('servTitulo').value.trim();
+    const descripcion = document.getElementById('servDesc').value.trim();
+    const icon = document.getElementById('servIconPicker').dataset.selected || 'pc';
+    if(!titulo || !descripcion) return alert('Completa el título y la descripción');
+    try {
+      if(id) {
+        await updateDoc(fsDoc(db, 'servicios', id), { titulo, descripcion, icon });
+      } else {
+        // nuevo servicio: va al final
+        const snap = await getDocs(collection(db, 'servicios'));
+        const orden = snap.size;
+        await addDoc(collection(db, 'servicios'), { titulo, descripcion, icon, orden, timestamp: new Date() });
+      }
+      closeServModal();
+    } catch(e) {
+      alert('Error: ' + e.message);
+    }
+  };
+
+  window.deleteServItem = async (id) => {
+    if(!confirm('¿Eliminar este servicio?')) return;
+    try {
+      await deleteDoc(fsDoc(db, 'servicios', id));
+    } catch(e) {
+      alert('Error al eliminar: ' + e.message);
+    }
+  };
+
+  // Cargar servicios públicos al inicio (para visitantes)
+  loadServicios();
 
   // Save new portfolio item
   window.savePortItem = async () => {
