@@ -745,17 +745,17 @@
       <p style="color:var(--ink-faint);font-size:13.5px;line-height:1.7">Aquí podrás agregar nuevas secciones a tu página más adelante, como:<br>• Testimonios de clientes<br>• Blog o noticias<br>• Promociones y ofertas<br><br>Esta funcionalidad se habilitará próximamente.</p>
     </div>
   </div>
-</div>
 
-<!-- Port Modal -->
-<div id="portModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);align-items:center;justify-content:center">
-  <div style="background:#0d1b22;border:1px solid var(--cyan);border-radius:16px;padding:28px;max-width:420px;width:90%">
-    <h3 style="color:var(--cyan);margin:0 0 16px">Agregar trabajo al portafolio</h3>
-    <div class="field" style="margin-bottom:12px"><label style="color:var(--ink)">Ruta de imagen</label><input id="portImg" type="text" placeholder="img/trabajo1.jpg"></div>
-    <div class="field" style="margin-bottom:12px"><label style="color:var(--ink)">Descripción</label><input id="portDesc" type="text" placeholder="Instalación de cámaras CCTV"></div>
-    <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn btn-primary" onclick="savePortItem()" style="flex:1">Guardar</button>
-      <button class="btn btn-ghost" onclick="closePortModal()" style="flex:1">Cancelar</button>
+  <!-- Port Modal (inside admin-panel to avoid CSS display:none override) -->
+  <div id="portModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);align-items:center;justify-content:center">
+    <div style="background:#0d1b22;border:1px solid var(--cyan);border-radius:16px;padding:28px;max-width:420px;width:90%">
+      <h3 style="color:var(--cyan);margin:0 0 16px">Agregar trabajo al portafolio</h3>
+      <div class="field" style="margin-bottom:12px"><label style="color:var(--ink)">Ruta de imagen</label><input id="portImg" type="text" placeholder="img/trabajo1.jpg"></div>
+      <div class="field" style="margin-bottom:12px"><label style="color:var(--ink)">Descripción</label><input id="portDesc" type="text" placeholder="Instalación de cámaras CCTV"></div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-primary" onclick="savePortItem()" style="flex:1">Guardar</button>
+        <button class="btn btn-ghost" onclick="closePortModal()" style="flex:1">Cancelar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -763,7 +763,7 @@
 <!-- Firebase SDK & Admin Logic -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, deleteDoc, doc as fsDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
@@ -836,14 +836,15 @@
     onSnapshot(q, (snap) => {
       let adminHtml = '';
       let pubHtml = '';
-      snap.forEach(doc => {
-        const d = doc.data();
-        const item = `<div class="port-item"><img src="${d.img}" alt="trabajo"><div class="overlay"><h4>${d.desc}</h4></div></div>`;
-        adminHtml += item;
-        pubHtml += item;
+      snap.forEach(docSnap => {
+        const d = docSnap.data();
+        const pubItem = `<div class="port-item"><img src="${d.img}" alt="${d.desc}"><div class="overlay"><h4>${d.desc}</h4></div></div>`;
+        const adminItem = `<div class="port-item" style="position:relative"><img src="${d.img}" alt="${d.desc}"><div class="overlay"><h4>${d.desc}</h4></div><button onclick="deletePortItem('${docSnap.id}')" style="position:absolute;top:8px;right:8px;background:rgba(200,30,30,.9);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;z-index:2;line-height:1">✕</button></div>`;
+        adminHtml += adminItem;
+        pubHtml += pubItem;
       });
       const aG = document.getElementById('adminPortGrid');
-      if(aG) aG.innerHTML = adminHtml;
+      if(aG) aG.innerHTML = adminHtml || '<p style="color:var(--ink-faint);font-size:13px;margin-top:8px">Aún no hay trabajos. Usa el botón para agregar.</p>';
       const pG = document.getElementById('portGrid');
       if(pG) pG.innerHTML = pubHtml;
     });
@@ -864,6 +865,15 @@
       document.getElementById('portDesc').value = '';
     } catch(e) {
       alert('Error: ' + e.message);
+    }
+  };
+
+  window.deletePortItem = async (id) => {
+    if(!confirm('¿Eliminar este trabajo del portafolio?')) return;
+    try {
+      await deleteDoc(fsDoc(db, 'portfolio', id));
+    } catch(e) {
+      alert('Error al eliminar: ' + e.message);
     }
   };
 
