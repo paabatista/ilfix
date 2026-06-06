@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ILFIX · Soluciones Tecnológicas — Soporte IT en Ciudad de Panamá</title>
 <meta name="description" content="ILFIX: Soporte técnico IT, reparación de PCs y laptops, cámaras CCTV, redes Wi-Fi, mantenimiento de impresoras, desarrollo de apps con AppSheet y páginas web. Ciudad de Panamá.">
+<meta property="og:title" content="ILFIX · Soluciones Tecnológicas IT">
+<meta property="og:description" content="Soporte técnico, redes, cámaras CCTV y desarrollo web/apps en Panamá.">
+<meta property="og:image" content="imperio_jesucristo_de_vida_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -202,10 +205,41 @@
   footer .fcredit{color:var(--ink-faint);font-size:12.5px;margin-top:10px;opacity:.7}
 
   /* floating WA */
-  .wa-float{position:fixed;bottom:24px;right:24px;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c52);display:flex;align-items:center;justify-content:center;z-index:200;box-shadow:0 10px 30px rgba(37,211,102,.4);transition:.3s;animation:floaty 3s ease-in-out infinite}
+  .wa-wrap{position:fixed;bottom:24px;right:24px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+  .wa-bubble{background:#fff;color:#128c52;padding:10px 16px;border-radius:14px 14px 2px 14px;font-size:13.5px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;transform:translateY(10px) scale(0.9);animation:popBubble .5s forwards;animation-delay:4s;transform-origin:bottom right}
+  @keyframes popBubble{to{opacity:1;transform:none}}
+  .wa-float{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c52);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(37,211,102,.4);transition:.3s;animation:floaty 3s ease-in-out infinite}
   .wa-float:hover{transform:scale(1.08)}
   .wa-float svg{width:30px;height:30px;fill:#fff}
   @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+  /* Admin & Portfolio CSS */
+  #admin-panel{display:none;min-height:100vh;padding:100px 24px 60px;background:var(--teal-darkest);position:fixed;inset:0;z-index:9999;overflow-y:auto}
+  body.admin-mode #admin-panel{display:block}
+  body.admin-mode > :not(#admin-panel):not(.bg-wrap){display:none!important}
+  
+  .admin-box{max-width:1000px;margin:0 auto;background:rgba(8,27,34,.8);border:1px solid var(--cyan);border-radius:24px;padding:34px}
+  .admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;border-bottom:1px solid var(--line);padding-bottom:16px}
+  .admin-tabs{display:flex;gap:16px;margin-bottom:24px}
+  .tab-btn{background:none;border:1px solid var(--line);color:var(--ink);padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600}
+  .tab-btn.active{background:var(--cyan);color:#000;border-color:var(--cyan)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+
+  .leads-table{width:100%;border-collapse:collapse;margin-top:16px}
+  .leads-table th,.leads-table td{padding:12px 16px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+  .leads-table th{color:var(--cyan-soft);font-weight:600}
+  .leads-table tr:hover{background:rgba(255,255,255,.02)}
+
+  .port-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+  .port-item{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);aspect-ratio:4/3}
+  .port-item img{width:100%;height:100%;object-fit:cover;transition:.4s}
+  .port-item:hover img{transform:scale(1.05)}
+  .port-item .cap{position:absolute;inset:auto 0 0 0;padding:24px 16px 16px;background:linear-gradient(0deg,rgba(0,0,0,.9),transparent);color:#fff;font-size:14px;font-weight:500;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+  .admin-btn{background:rgba(0,0,0,.6);color:#fff;border:1px solid var(--line);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;margin:4px;backdrop-filter:blur(4px);transition:.2s}
+  .admin-btn:hover{background:var(--cyan);color:#000}
+  .admin-controls{position:absolute;top:10px;right:10px;display:none}
+  body.admin-mode .admin-controls{display:flex}
 
   /* reveal animation */
   .reveal{opacity:0;transform:translateY(28px);transition:.8s cubic-bezier(.16,.84,.44,1)}
@@ -238,6 +272,41 @@
     .panel{padding:28px}
     .sec-pad{padding:70px 0}
   }
+
+  /* ====== WA BUBBLE ====== */
+  .wa-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;align-items:center;gap:12px}
+  .wa-bubble{background:var(--ink);color:var(--teal-darkest);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.3);opacity:0;transform:translateY(10px);pointer-events:none;transition:.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
+  .wa-bubble.show{opacity:1;transform:translateY(0)}
+  .wa-float{width:60px;height:60px;background:#25d366;color:#fff;border-radius:50px;text-align:center;font-size:30px;box-shadow:0 6px 16px rgba(37,211,102,.4);display:flex;align-items:center;justify-content:center;transition:.3s;position:relative}
+  .wa-float:hover{transform:scale(1.08);box-shadow:0 10px 24px rgba(37,211,102,.6)}
+  .wa-float svg{width:34px;height:34px;fill:currentColor}
+
+  /* ====== PORTFOLIO ====== */
+  .port-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px;margin-top:40px}
+  .port-item{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;background:var(--teal-deep)}
+  .port-item img{width:100%;height:100%;object-fit:cover;transition:.5s}
+  .port-item .overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,27,34,.9) 0%,transparent 60%);display:flex;align-items:flex-end;padding:20px;opacity:0;transition:.4s}
+  .port-item h4{color:var(--cyan);font-size:15px;transform:translateY(10px);transition:.4s}
+  .port-item:hover img{transform:scale(1.05)}
+  .port-item:hover .overlay{opacity:1}
+  .port-item:hover h4{transform:translateY(0)}
+
+  /* ====== ADMIN PANEL ====== */
+  body.admin-mode .admin-only{display:inline-block !important}
+  #admin-panel{display:none;padding:60px 24px;background:#0d1b22;border-top:1px solid var(--cyan)}
+  body.admin-mode #admin-panel{display:block}
+  .admin-box{max-width:900px;margin:0 auto;background:var(--teal-darkest);border:1px solid rgba(143,227,240,.2);border-radius:16px;padding:30px}
+  .admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.05)}
+  .admin-tabs{display:flex;gap:8px;margin-bottom:24px;border-bottom:1px solid rgba(255,255,255,.05);padding-bottom:16px}
+  .tab-btn{background:none;border:none;color:var(--ink-dim);padding:8px 16px;cursor:pointer;border-radius:8px;font-weight:600;transition:.3s}
+  .tab-btn:hover{background:rgba(255,255,255,.05);color:var(--ink)}
+  .tab-btn.active{background:var(--cyan);color:var(--teal-darkest)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  
+  .leads-table{width:100%;border-collapse:collapse;font-size:14px}
+  .leads-table th{text-align:left;padding:12px;background:rgba(255,255,255,.03);color:var(--cyan);border-bottom:1px solid rgba(255,255,255,.1)}
+  .leads-table td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--ink-dim)}
 </style>
 </head>
 <body>
@@ -424,6 +493,21 @@
   </div>
 </section>
 
+<!-- ===== PORTAFOLIO ===== -->
+<section class="sec-pad" id="portafolio">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Nuestro trabajo</div>
+      <h2>Portafolio de proyectos</h2>
+      <p>Algunos de nuestros trabajos recientes en reparación, instalación de cámaras, redes y más.</p>
+    </div>
+    <div class="port-grid" id="portGrid">
+      <!-- Portfolio items loaded dynamically or from admin -->
+    </div>
+    <button class="btn btn-ghost admin-only" id="addPortBtn" style="display:none;margin-top:20px" onclick="openPortModal()">+ Agregar trabajo</button>
+  </div>
+</section>
+
 <!-- ===== RESERVAR + COTIZAR ===== -->
 <section class="sec-pad" id="reservar">
   <div class="wrap">
@@ -554,9 +638,12 @@
 </section>
 
 <!-- floating WhatsApp -->
-<a class="wa-float" href="https://wa.me/50765893700?text=Hola%20ILFIX,%20me%20gustaría%20más%20información" target="_blank" rel="noopener" aria-label="WhatsApp">
-  <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 0 0 1.692 5.549l-.999 3.648 3.806-.998zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
-</a>
+<div class="wa-wrap">
+  <div class="wa-bubble" id="waBubble">💬 ¿Necesitas ayuda técnica?</div>
+  <a class="wa-float" href="https://wa.me/50765893700?text=Hola%20ILFIX,%20me%20gustaría%20más%20información" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 0 0 1.692 5.549l-.999 3.648 3.806-.998zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
+  </a>
+</div>
 
 <script>
   // year
@@ -623,6 +710,216 @@
     );
     window.location.href = 'mailto:ilfix@outlook.com?subject=' + subject + '&body=' + body;
   });
+</script>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div id="admin-panel">
+  <div class="admin-box">
+    <div class="admin-header">
+      <h2 style="color:var(--cyan);margin:0">🔧 Panel de Administración</h2>
+      <button class="btn btn-ghost" onclick="logoutAdmin()" style="padding:6px 14px;font-size:13px">Cerrar sesión</button>
+    </div>
+    <div class="admin-tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-leads',this)">📋 Cotizaciones</button>
+      <button class="tab-btn" onclick="switchTab('tab-port',this)">🖼️ Portafolio</button>
+      <button class="tab-btn" onclick="switchTab('tab-sections',this)">📂 Secciones</button>
+    </div>
+    <div id="tab-leads" class="tab-content active">
+      <h3 style="color:var(--ink);margin-bottom:8px">Cotizaciones recibidas</h3>
+      <p style="color:var(--ink-faint);font-size:13px;margin-bottom:16px">Aquí aparecerán las solicitudes que los clientes envíen desde el formulario.</p>
+      <div id="leadsContainer">
+        <table class="leads-table" id="leadsTable">
+          <thead><tr><th>Fecha</th><th>Nombre</th><th>Teléfono</th><th>Servicio</th><th>Tipo</th><th>Detalle</th></tr></thead>
+          <tbody id="leadsBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="tab-port" class="tab-content">
+      <h3 style="color:var(--ink);margin-bottom:8px">Gestión de Portafolio</h3>
+      <p style="color:var(--ink-faint);font-size:13px;margin-bottom:16px">Agrega trabajos indicando la ruta de la imagen (ej: img/trabajo1.jpg) y una descripción.</p>
+      <button class="btn btn-primary" onclick="openPortModal()" style="margin-bottom:20px;padding:8px 18px;font-size:13px">+ Agregar trabajo</button>
+      <div class="port-grid" id="adminPortGrid"></div>
+    </div>
+    <div id="tab-sections" class="tab-content">
+      <h3 style="color:var(--ink);margin-bottom:8px">Secciones futuras</h3>
+      <p style="color:var(--ink-faint);font-size:13.5px;line-height:1.7">Aquí podrás agregar nuevas secciones a tu página más adelante, como:<br>• Testimonios de clientes<br>• Blog o noticias<br>• Promociones y ofertas<br><br>Esta funcionalidad se habilitará próximamente.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Port Modal -->
+<div id="portModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);align-items:center;justify-content:center">
+  <div style="background:#0d1b22;border:1px solid var(--cyan);border-radius:16px;padding:28px;max-width:420px;width:90%">
+    <h3 style="color:var(--cyan);margin:0 0 16px">Agregar trabajo al portafolio</h3>
+    <div class="field" style="margin-bottom:12px"><label style="color:var(--ink)">Ruta de imagen</label><input id="portImg" type="text" placeholder="img/trabajo1.jpg"></div>
+    <div class="field" style="margin-bottom:12px"><label style="color:var(--ink)">Descripción</label><input id="portDesc" type="text" placeholder="Instalación de cámaras CCTV"></div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-primary" onclick="savePortItem()" style="flex:1">Guardar</button>
+      <button class="btn btn-ghost" onclick="closePortModal()" style="flex:1">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK & Admin Logic -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJFVZ0wzIzO6SWH1rvWqbAdb_NKOBxW8w",
+    authDomain: "ilfix-46136.firebaseapp.com",
+    projectId: "ilfix-46136",
+    storageBucket: "ilfix-46136.firebasestorage.app",
+    messagingSenderId: "603006174802",
+    appId: "1:603006174802:web:2e7019f2da87342ae3818b",
+    measurementId: "G-RKHP9GJ6B7"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const analytics = getAnalytics(app);
+
+  window.db = db;
+  window.auth = auth;
+  window.collection = collection;
+  window.addDoc = addDoc;
+  window.getDocs = getDocs;
+
+  // Double click logo to login
+  const logoEl = document.querySelector('.logo');
+  if(logoEl) logoEl.addEventListener('dblclick', (e) => {
+    e.preventDefault();
+    loginAdmin();
+  });
+
+  window.loginAdmin = () => {
+    const email = prompt('Correo de administrador:');
+    if(!email) return;
+    const pass = prompt('Contraseña:');
+    if(!pass) return;
+    signInWithEmailAndPassword(auth, email, pass).catch(err => alert('Error: ' + err.message));
+  };
+
+  window.logoutAdmin = () => {
+    signOut(auth);
+  };
+
+  onAuthStateChanged(auth, user => {
+    if(user) {
+      document.body.classList.add('admin-mode');
+      loadLeads();
+      loadPortfolio();
+    } else {
+      document.body.classList.remove('admin-mode');
+    }
+  });
+
+  function loadLeads() {
+    const q = query(collection(db, 'cotizaciones'), orderBy('timestamp', 'desc'));
+    onSnapshot(q, (snap) => {
+      let html = '';
+      snap.forEach(doc => {
+        const d = doc.data();
+        const date = d.timestamp ? new Date(d.timestamp.toMillis()).toLocaleString() : '';
+        html += `<tr><td>${date}</td><td>${d.nombre||''}</td><td>${d.telefono||''}</td><td>${d.servicio||''}</td><td>${d.tipo||''}</td><td>${d.detalle||''}</td></tr>`;
+      });
+      const t = document.getElementById('leadsBody');
+      if(t) t.innerHTML = html;
+    });
+  }
+
+  window.loadPortfolio = function() {
+    const q = query(collection(db, 'portfolio'), orderBy('timestamp', 'desc'));
+    onSnapshot(q, (snap) => {
+      let adminHtml = '';
+      let pubHtml = '';
+      snap.forEach(doc => {
+        const d = doc.data();
+        const item = `<div class="port-item"><img src="${d.img}" alt="trabajo"><div class="overlay"><h4>${d.desc}</h4></div></div>`;
+        adminHtml += item;
+        pubHtml += item;
+      });
+      const aG = document.getElementById('adminPortGrid');
+      if(aG) aG.innerHTML = adminHtml;
+      const pG = document.getElementById('portGrid');
+      if(pG) pG.innerHTML = pubHtml;
+    });
+  }
+
+  // Load public portfolio initially
+  loadPortfolio();
+
+  // Save new portfolio item
+  window.savePortItem = async () => {
+    const img = document.getElementById('portImg').value;
+    const desc = document.getElementById('portDesc').value;
+    if(!img || !desc) return alert('Completa los campos');
+    try {
+      await addDoc(collection(db, 'portfolio'), { img, desc, timestamp: new Date() });
+      closePortModal();
+      document.getElementById('portImg').value = '';
+      document.getElementById('portDesc').value = '';
+    } catch(e) {
+      alert('Error: ' + e.message);
+    }
+  };
+
+  // Submit Quote form to Firebase
+  const quoteForm = document.getElementById('quoteForm');
+  if(quoteForm) {
+    quoteForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = quoteForm.querySelector('button[type="submit"]');
+      const oldTxt = btn.innerText;
+      btn.innerText = 'Enviando...';
+      try {
+        await addDoc(collection(db, 'cotizaciones'), {
+          nombre: document.getElementById('name').value,
+          telefono: document.getElementById('phone').value,
+          servicio: document.getElementById('service').value,
+          tipo: document.getElementById('type').value,
+          detalle: document.getElementById('details').value,
+          timestamp: new Date()
+        });
+        alert('Cotización enviada. Nos pondremos en contacto pronto.');
+        quoteForm.reset();
+      } catch(error) {
+        alert('Hubo un error. Por favor, intenta de nuevo.');
+      }
+      btn.innerText = oldTxt;
+    });
+  }
+</script>
+
+<!-- Tab / Modal Logic -->
+<script>
+  window.switchTab = function(id, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  };
+  window.openPortModal = function() {
+    document.getElementById('portModal').style.display = 'flex';
+  };
+  window.closePortModal = function() {
+    document.getElementById('portModal').style.display = 'none';
+  };
+  
+  // WhatsApp logic
+  const waWrap = document.querySelector('.wa-wrap');
+  const waBubble = document.getElementById('waBubble');
+  if(waWrap && waBubble) {
+    waWrap.addEventListener('mouseenter', () => waBubble.classList.add('show'));
+    waWrap.addEventListener('mouseleave', () => waBubble.classList.remove('show'));
+    setTimeout(() => {
+      waBubble.classList.add('show');
+      setTimeout(() => waBubble.classList.remove('show'), 4000);
+    }, 5000);
+  }
 </script>
 </body>
 </html>
